@@ -15,8 +15,6 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Support\RawJs;
 use Filament\Forms\Components\TextInput;
 
-
-
 class KaryawanResource extends Resource
 {
     protected static ?string $model = Karyawan::class;
@@ -117,14 +115,19 @@ class KaryawanResource extends Resource
                     Forms\Components\DatePicker::make('tanggal_keluar')->label('Tanggal Keluar')->displayFormat('d/m/Y')->visible(fn(Forms\Get $get) => $get('status_karyawan') !== 'Aktif'),
 
                     Forms\Components\TextInput::make('gaji_pokok')
-                    ->label('Gaji Pokok')
-                    ->numeric()
-                    ->prefix('Rp')
-                    ->default(0)
-                    ->mask(RawJs::make(<<<'JS'
-                                  $money($input, '.', ',', 0)
-                              JS))
-                    ->stripCharacters(['.', ',']),
+                        ->label('Gaji Pokok')
+                        ->numeric()
+                        ->prefix('Rp')
+                        ->default(0)
+                        ->mask(
+                            RawJs::make(
+                                <<<'JS'
+                                    $money($input, '.', ',', 0)
+                                JS
+                                ,
+                            ),
+                        )
+                        ->stripCharacters(['.', ',']),
                 ])
                 ->columns(2),
 
@@ -161,7 +164,28 @@ class KaryawanResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nik')->label('NIK')->searchable()->sortable()->copyable()->weight('medium'),
 
-                Tables\Columns\ImageColumn::make('foto')->label('Foto')->circular()->size(40)->disk('public')->defaultImageUrl(fn() => asset('images/no-photo.png')),
+                Tables\Columns\TextColumn::make('foto')
+                    ->label('Foto')
+                    ->html()
+                    ->formatStateUsing(function ($state) {
+                        if (!$state) {
+                            return '<div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                        </svg>
+                                    </div>';
+                        }
+
+                        $imageUrl = url('storage/' . $state);
+                        return '<img src="' .
+                            $imageUrl .
+                            '"
+                                    alt="Foto Karyawan"
+                                    class="w-10 h-10 rounded-full object-cover border border-gray-200"
+                                    onerror="this.onerror=null; this.src=\'' .
+                            url('images/no-photo.png') .
+                            '\'">';
+                    }),
 
                 Tables\Columns\TextColumn::make('nama')->label('Nama Karyawan')->searchable()->sortable()->weight('medium')->description(fn($record) => $record->jabatan . ($record->departemen ? ' - ' . $record->departemen : '')),
 

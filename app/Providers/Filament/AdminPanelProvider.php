@@ -45,9 +45,11 @@ class AdminPanelProvider extends PanelProvider
               \App\Filament\Resources\TransaksiKeluarResource::class,
             ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
-            ->pages([Pages\Dashboard::class])
+            ->pages([\App\Filament\Pages\Dashboard::class,])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([Widgets\AccountWidget::class])
+            ->widgets([
+              // Widgets\AccountWidget::class
+              ])
             ->middleware([EncryptCookies::class, AddQueuedCookiesToResponse::class, StartSession::class, AuthenticateSession::class, ShareErrorsFromSession::class, VerifyCsrfToken::class, SubstituteBindings::class, DisableBladeIconComponents::class, DispatchServingFilamentEvent::class])
             ->authMiddleware([Authenticate::class])
             ->navigationGroups(['Master Data', 'Transaksi', 'Partner', 'Manajemen', 'Laporan'])

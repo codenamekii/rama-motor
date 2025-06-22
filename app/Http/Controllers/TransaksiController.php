@@ -25,7 +25,16 @@ class TransaksiController extends Controller
         $transaksiKeluar->load(['pelanggan', 'details.barang.satuanBarang', 'user']);
 
         $pdf = Pdf::loadView('pdf.transaksi-keluar', compact('transaksiKeluar'));
-        $pdf->setPaper([0, 0, 226.77, 566.93], 'portrait'); // 80mm x 200mm for receipt
+
+        // Ukuran kertas thermal printer 80mm (58mm printable area)
+        // 58mm = 164.4 points, with height auto
+        $pdf->setPaper([0, 0, 164.4, 500], 'portrait');
+
+        // Set margin kecil untuk thermal printer
+        $pdf->setOption('margin-top', 5);
+        $pdf->setOption('margin-right', 5);
+        $pdf->setOption('margin-bottom', 5);
+        $pdf->setOption('margin-left', 5);
 
         return $pdf->stream('Struk-' . $transaksiKeluar->no_transaksi . '.pdf');
     }

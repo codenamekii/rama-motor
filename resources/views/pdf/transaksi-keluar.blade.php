@@ -5,35 +5,77 @@
   <meta charset="utf-8">
   <title>Struk - {{ $transaksiKeluar->no_transaksi }}</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Courier New', monospace;
-      font-size: 11px;
-      width: 80mm;
+      font-size: 9px;
+      line-height: 1.2;
+      width: 58mm;
       margin: 0;
-      padding: 5px;
+      padding: 2mm;
     }
 
     .header {
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 2mm;
     }
 
     .header h3 {
-      margin: 5px 0;
+      margin: 0;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .header small {
+      font-size: 8px;
     }
 
     .info {
-      margin-bottom: 10px;
+      margin-bottom: 2mm;
+      font-size: 8px;
     }
 
-    .detail-table {
-      width: 100%;
-      margin-bottom: 10px;
+    .items {
+      margin-bottom: 2mm;
     }
 
-    .detail-table td {
-      padding: 2px 0;
-      vertical-align: top;
+    .item {
+      margin-bottom: 1mm;
+      font-size: 8px;
+    }
+
+    .item-name {
+      font-size: 9px;
+    }
+
+    .item-detail {
+      display: flex;
+      justify-content: space-between;
+      margin-left: 2mm;
+    }
+
+    .totals {
+      margin-bottom: 2mm;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 8px;
+      margin-bottom: 0.5mm;
+    }
+
+    .total-row.grand-total {
+      font-size: 10px;
+      font-weight: bold;
+      margin-top: 1mm;
+      padding-top: 1mm;
+      border-top: 1px dashed #000;
     }
 
     .text-right {
@@ -46,18 +88,22 @@
 
     .dashed {
       border-bottom: 1px dashed #000;
-      margin: 5px 0;
-    }
-
-    .total {
-      font-weight: bold;
-      font-size: 12px;
+      margin: 2mm 0;
     }
 
     .footer {
       text-align: center;
-      margin-top: 20px;
-      font-size: 10px;
+      margin-top: 3mm;
+      font-size: 8px;
+    }
+
+    table {
+      width: 100%;
+    }
+
+    /* Pastikan tidak ada overflow */
+    .currency {
+      white-space: nowrap;
     }
   </style>
 </head>
@@ -65,81 +111,89 @@
 <body>
   <div class="header">
     <h3>RAMA MOTOR</h3>
-    <small>Jl. Rama Motor No. 123<br>Telp: (021) 1234567</small>
+    <small>
+      Jl. Rama Motor No. 123<br>
+      Telp: (021) 1234567
+    </small>
   </div>
 
   <div class="dashed"></div>
 
   <div class="info">
-    No: {{ $transaksiKeluar->no_transaksi }}<br>
-    Tgl: {{ $transaksiKeluar->tanggal_transaksi->format('d/m/Y H:i') }}<br>
-    Kasir: {{ $transaksiKeluar->user->name }}<br>
+    <div>No: {{ $transaksiKeluar->no_transaksi }}</div>
+    <div>Tgl: {{ $transaksiKeluar->tanggal_transaksi->format('d/m/Y H:i') }}</div>
+    <div>Kasir: {{ $transaksiKeluar->user->name }}</div>
     @if ($transaksiKeluar->pelanggan)
-      Pelanggan: {{ $transaksiKeluar->pelanggan->nama }}<br>
+      <div>Pelanggan: {{ $transaksiKeluar->pelanggan->nama }}</div>
     @endif
   </div>
 
   <div class="dashed"></div>
 
-  <table class="detail-table">
+  <div class="items">
     @foreach ($transaksiKeluar->details as $detail)
-      <tr>
-        <td colspan="3">{{ $detail->barang->nama }}</td>
-      </tr>
-      <tr>
-        <td width="40%">{{ $detail->jumlah }} {{ $detail->barang->satuanBarang->singkatan }} x
-          {{ number_format($detail->harga_jual, 0, ',', '.') }}</td>
-        <td width="30%">
-          @if ($detail->diskon_persen > 0)
+      <div class="item">
+        <div class="item-name">{{ Str::limit($detail->barang->nama, 30) }}</div>
+        <div class="item-detail">
+          <span>{{ $detail->jumlah }} {{ $detail->barang->satuanBarang->singkatan }} x
+            {{ number_format($detail->harga_jual, 0, ',', '.') }}</span>
+          <span class="currency">{{ number_format($detail->subtotal, 0, ',', '.') }}</span>
+        </div>
+        @if ($detail->diskon_persen > 0)
+          <div style="margin-left: 2mm; font-size: 7px;">
             Disc {{ $detail->diskon_persen }}%
-          @endif
-        </td>
-        <td width="30%" class="text-right">{{ number_format($detail->subtotal, 0, ',', '.') }}</td>
-      </tr>
+          </div>
+        @endif
+      </div>
     @endforeach
-  </table>
+  </div>
 
   <div class="dashed"></div>
 
-  <table style="width: 100%;">
-    <tr>
-      <td>Subtotal:</td>
-      <td class="text-right">{{ number_format($transaksiKeluar->total_harga, 0, ',', '.') }}</td>
-    </tr>
+  <div class="totals">
+    <div class="total-row">
+      <span>Subtotal:</span>
+      <span class="currency">{{ number_format($transaksiKeluar->total_harga, 0, ',', '.') }}</span>
+    </div>
+
     @if ($transaksiKeluar->diskon_nominal > 0)
-      <tr>
-        <td>Diskon:</td>
-        <td class="text-right">{{ number_format($transaksiKeluar->diskon_nominal, 0, ',', '.') }}</td>
-      </tr>
+      <div class="total-row">
+        <span>Diskon:</span>
+        <span class="currency">{{ number_format($transaksiKeluar->diskon_nominal, 0, ',', '.') }}</span>
+      </div>
     @endif
+
     @if ($transaksiKeluar->ppn_nominal > 0)
-      <tr>
-        <td>PPN:</td>
-        <td class="text-right">{{ number_format($transaksiKeluar->ppn_nominal, 0, ',', '.') }}</td>
-      </tr>
+      <div class="total-row">
+        <span>PPN:</span>
+        <span class="currency">{{ number_format($transaksiKeluar->ppn_nominal, 0, ',', '.') }}</span>
+      </div>
     @endif
-    <tr class="total">
-      <td>TOTAL:</td>
-      <td class="text-right">{{ number_format($transaksiKeluar->total_bayar, 0, ',', '.') }}</td>
-    </tr>
-    <tr>
-      <td>Bayar:</td>
-      <td class="text-right">{{ number_format($transaksiKeluar->jumlah_dibayar, 0, ',', '.') }}</td>
-    </tr>
+
+    <div class="total-row grand-total">
+      <span>TOTAL:</span>
+      <span class="currency">{{ number_format($transaksiKeluar->total_bayar, 0, ',', '.') }}</span>
+    </div>
+
+    <div class="total-row">
+      <span>Bayar:</span>
+      <span class="currency">{{ number_format($transaksiKeluar->jumlah_dibayar, 0, ',', '.') }}</span>
+    </div>
+
     @if ($transaksiKeluar->kembalian > 0)
-      <tr>
-        <td>Kembali:</td>
-        <td class="text-right">{{ number_format($transaksiKeluar->kembalian, 0, ',', '.') }}</td>
-      </tr>
+      <div class="total-row">
+        <span>Kembali:</span>
+        <span class="currency">{{ number_format($transaksiKeluar->kembalian, 0, ',', '.') }}</span>
+      </div>
     @endif
-  </table>
+  </div>
 
   <div class="dashed"></div>
 
   <div class="footer">
-    <p>*** TERIMA KASIH ***<br>
-      Barang yang sudah dibeli<br>
-      tidak dapat dikembalikan</p>
+    <strong>*** TERIMA KASIH ***</strong><br>
+    Barang yang sudah dibeli<br>
+    tidak dapat dikembalikan
   </div>
 </body>
 
