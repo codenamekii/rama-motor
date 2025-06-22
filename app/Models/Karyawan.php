@@ -11,7 +11,7 @@ class Karyawan extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nik', 'nama', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'alamat', 'telepon', 'email', 'status_pernikahan', 'pendidikan_terakhir', 'jabatan', 'departemen', 'tanggal_masuk', 'tanggal_keluar', 'status_karyawan', 'gaji_pokok', 'no_rekening', 'nama_bank', 'foto', 'catatan'];
+    protected $fillable = ['nik', 'nama', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'alamat', 'telepon', 'email', 'status_pernikahan', 'pendidikan_terakhir', 'jabatan', 'tanggal_masuk', 'tanggal_keluar', 'status_karyawan', 'gaji_pokok', 'no_rekening', 'nama_bank', 'foto', 'catatan'];
 
     protected $casts = [
         'tanggal_lahir' => 'date',
@@ -90,22 +90,9 @@ class Karyawan extends Model
             $q->where('nik', 'like', "%{$search}%")
                 ->orWhere('nama', 'like', "%{$search}%")
                 ->orWhere('jabatan', 'like', "%{$search}%")
-                ->orWhere('departemen', 'like', "%{$search}%")
                 ->orWhere('telepon', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%");
         });
-    }
-
-    /**
-     * Scope berdasarkan departemen
-     */
-    public function scopeDepartemen(Builder $query, ?string $departemen): Builder
-    {
-        if (!$departemen) {
-            return $query;
-        }
-
-        return $query->where('departemen', $departemen);
     }
 
     /**

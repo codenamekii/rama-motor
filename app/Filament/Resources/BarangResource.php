@@ -156,7 +156,15 @@ class BarangResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('kode')->label('Kode')->searchable()->sortable()->copyable()->weight('medium'),
 
-                Tables\Columns\ImageColumn::make('gambar')->label('Foto')->circular()->defaultImageUrl(url('/images/no-image.png')),
+                Tables\Columns\TextColumn::make('gambar')
+                    ->label('Foto')
+                    ->html()
+                    ->formatStateUsing(function ($state) {
+                        if (!$state) {
+                            return '<div class="w-10 h-10 rounded-full bg-gray-300"></div>';
+                        }
+                        return '<img src="' . url('storage/' . $state) . '" class="w-10 h-10 rounded-full object-cover">';
+                    }),
 
                 Tables\Columns\TextColumn::make('nama')->label('Nama Barang')->searchable()->sortable()->weight('medium')->description(fn($record) => $record->jenisBarang->nama . ' - ' . $record->merkBarang->nama)->wrap(),
 
