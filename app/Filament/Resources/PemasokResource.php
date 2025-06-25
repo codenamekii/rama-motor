@@ -139,7 +139,7 @@ class PemasokResource extends Resource
                     }),
                 ),
             ])
-            ->actions([Tables\Actions\ViewAction::make()->slideOver(), Tables\Actions\EditAction::make(), Tables\Actions\Action::make('lihat_transaksi')->label('Transaksi')->icon('heroicon-o-document-text')->color('info')->url(fn($record) => route('filament.admin.resources.transaksi-masuks.index', ['tableFilters[pemasok_id][value]' => $record->id]))->openUrlInNewTab()])
+            ->actions([Tables\Actions\ViewAction::make()->slideOver(), Tables\Actions\EditAction::make(), Tables\Actions\Action::make('lihat_transaksi')->label('Transaksi')->icon('heroicon-o-document-text')->color('info')->url(fn($record) => route('filament.admin.resources.transaksi-masuk.index', ['tableFilters[pemasok_id][value]' => $record->id]))->openUrlInNewTab()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
             ->defaultSort('kode', 'desc')
             ->poll('60s');
